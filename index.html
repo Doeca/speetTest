@@ -27,9 +27,15 @@
         let ping = 0; //用于修正时间误差
         let dlT = 0;
 
+        function sleep(ms) {
+            return new Promise(resolve =>
+                setTimeout(resolve, ms)
+            )
+        }
+
         function chunk() {
-            //构造10mb大小的随机数据包
-            let r = new ArrayBuffer(524288),
+            //构造100kb大小的随机数据包
+            let r = new ArrayBuffer(102400),
                 maxInt = Math.pow(2, 32) - 1;
             try {
                 r = new Uint32Array(r);
@@ -56,15 +62,17 @@
 
         ws.on('dlTest', (down, data, id) => {
             dlT += Date.now() - down;
-            if (id == 10) {
-                dlT /= 10;
-                let dlSpeed = 80000 / dlT; //单位Mbps
+            if (id == 5) {
+                dlT /= 5;
+                let dlSpeed = 781.25 / dlT; //单位Mbps
                 document.getElementById("dlText").innerHTML = dlSpeed;
                 console.log('Start upload speed test');
 
 
-                for (let i = 1; i <= 10; i++) {
-                    ws.emit("ulTest", i, Date.now(), chunk());
+                for (let i = 1; i <= 5; i++) {
+                    sleep(1000).then(() => {
+                        ws.emit("ulTest", i, Date.now(), chunk());
+                    });
                 }
 
                 console.log('finished')

@@ -1,5 +1,5 @@
 {
-    "name": "websocket-test",
+    "name": "websocket-speedtest",
     "version": "1.0.0",
     "description": "",
     "main": "server.js",

@@ -17,8 +17,8 @@ upT = 0;
 ping = 0;
 
 function chunk() {
-    //构造10mb大小的随机数据包
-    var r = new ArrayBuffer(10485760),
+    //构造100kb大小的随机数据包
+    var r = new ArrayBuffer(102400),
         maxInt = Math.pow(2, 32) - 1;
     try {
         r = new Uint32Array(r);
@@ -27,15 +27,21 @@ function chunk() {
     return r;
 }
 
+function sleep(ms) {
+    return new Promise(resolve =>
+        setTimeout(resolve, ms)
+    )
+}
+
 
 ws.on('connection', (client) => {
 
     client.on("ulTest", (id, down, data) => {
         //console.log(id, down, data);
         upT += Date.now() - down;
-        if (id == 10) {
-            upT /= 10;
-            let upSpeed = 4000 / upT; //单位Mbps
+        if (id == 5) {
+            upT /= 5;
+            let upSpeed = 781.25 / upT; //单位Mbps
             client.emit('upTest', upSpeed);
         }
     })
@@ -62,8 +68,8 @@ ws.on('connection', (client) => {
     //测算client的下载速度（本机上传速度会带来误差）
     client.on('dlTest', () => {
         try {
-            for (let i = 1; i <= 10; i++) {
-                client.emit('dlTest', Date.now(), chunk(), i)
+            for (let i = 1; i <= 5; i++) {
+                sleep(1000).then(() => { client.emit('dlTest', Date.now(), chunk(), i); });
             }
         } catch (e) {
             console.error(e)
