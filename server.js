@@ -49,7 +49,7 @@ ws.on('connection', (client) => {
     client.on('dlTest', () => {
         try {
             for (i = 5; i >= 0; i--) {
-                client.emit('dlTest', Date.now(), chunk())
+                client.emit('dlTest', Date.now(), chunk(), i)
             }
         } catch (e) {
             console.error(e)

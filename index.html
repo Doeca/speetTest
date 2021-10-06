@@ -25,6 +25,7 @@
         let started = false;
         let startbtn = true;
         let ping = 0; //用于修正时间误差
+        let dlSpeed = 0;
 
         ws.on('ping', (up, down, id) => {
             if (id == 5) {
@@ -35,6 +36,10 @@
             }
             ws.emit('ping', Date.now(), 0, id + 1);
             ping += down;
+        })
+        ws.on('dlTest', (down, data, id) => {
+            let t = Date.now() - down()
+
         })
 
         function chunk() {
