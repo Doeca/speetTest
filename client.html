@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Websocket版网速测试</title>
+    <script defer>
+        let ws = new WebSocket("ws://" + window.location.host);
+        let started = false;
+        let startbtn = true;
+
+        ws.onmessage = (message) => {
+            // console.log({ started, message });
+            if (started) {
+                try {
+                    let msg = JSON.parse(message.data);
+                    console.log({
+                        up: Date.now() - msg.up,
+                        now: Date.now(),
+                        u: msg.up,
+                        down: msg.down,
+                    });
+                    document.getElementById("time").innerHTML =
+                        "Up: " +
+                        (Date.now() - msg.up) +
+                        " ms" +
+                        "<br />Down: " +
+                        msg.down +
+                        " ms";
+                    setTimeout(() => {
+                        if (started) ws.send(Date.now());
+                    }, 250);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
+
+        function stop() {
+            started = false;
+        }
+
+        function start() {
+            started = true;
+            ws.send(Date.now());
+            ws.send()
+        }
+
+        function btnclick() {
+            if (startbtn) {
+                start();
+                document.getElementById("start").innerHTML = "Stop";
+            } else {
+                stop();
+                document.getElementById("start").innerHTML = "Start";
+            }
+            startbtn = !startbtn;
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Websocket SpeedTest</h1>
+    <h2 id="time"></h2>
+    <br />
+    <button id="start" onclick="btnclick()">Start</button>
+</body>
+
+</html>
