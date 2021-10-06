@@ -25,26 +25,11 @@
         let started = false;
         let startbtn = true;
         let ping = 0; //用于修正时间误差
-        let dlSpeed = 0;
-
-        ws.on('ping', (up, down, id) => {
-            if (id == 5) {
-                ping /= 5;
-                console.log("ping:", ping);
-                ws.emit('dltest', Date.now())
-                return;
-            }
-            ws.emit('ping', Date.now(), 0, id + 1);
-            ping += down;
-        })
-        ws.on('dlTest', (down, data, id) => {
-            let t = Date.now() - down()
-
-        })
+        let dlT = 0;
 
         function chunk() {
-            //构造100kb大小的随机数据包
-            var r = new ArrayBuffer(102400),
+            //构造10mb大小的随机数据包
+            let r = new ArrayBuffer(524288),
                 maxInt = Math.pow(2, 32) - 1;
             try {
                 r = new Uint32Array(r);
@@ -52,6 +37,46 @@
             } catch (e) {}
             return r;
         }
+
+
+        ws.on('ping', (up, down, id) => {
+            if (id == 5) {
+                ping /= 5;
+                console.log("ping:", ping);
+                console.log('Start doanlowd speed test.');
+
+                dlT = 0;
+                ws.emit('getPing', ping);
+                ws.emit('dlTest', Date.now());
+                return;
+            }
+            ws.emit('ping', Date.now(), 0, id + 1);
+            ping += down;
+        })
+
+        ws.on('dlTest', (down, data, id) => {
+            dlT += Date.now() - down;
+            if (id == 10) {
+                dlT /= 10;
+                let dlSpeed = 80000 / dlT; //单位Mbps
+                document.getElementById("dlText").innerHTML = dlSpeed;
+                console.log('Start upload speed test');
+
+
+                for (let i = 1; i <= 10; i++) {
+                    ws.emit("ulTest", i, Date.now(), chunk());
+                }
+
+                console.log('finished')
+            }
+        })
+
+        ws.on('upTest', speed => {
+            document.getElementById("ulText").innerHTML = speed;
+            alert('finished');
+        })
+
+
 
         function start() {
             started = true;
