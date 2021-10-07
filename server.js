@@ -38,7 +38,7 @@ ws.on('connection', (client) => {
 
     client.on("ulTest", (id, down, data) => {
         //console.log(id, down, data);
-        upT += Date.now() - down;
+        upT += Date.now() - down - ping;
         if (id == 5) {
             upT /= 5;
             let upSpeed = 781.25 / upT; //单位Mbps

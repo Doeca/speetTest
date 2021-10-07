@@ -61,7 +61,7 @@
         })
 
         ws.on('dlTest', (down, data, id) => {
-            dlT += Date.now() - down;
+            dlT += Date.now() - down - ping;
             if (id == 5) {
                 dlT /= 5;
                 let dlSpeed = 781.25 / dlT; //单位Mbps
